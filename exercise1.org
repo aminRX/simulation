@@ -1,0 +1,218 @@
+* Ejercicios Repaso de Distribuciones de Probabilidad
+Instrucciones: Para cada ejercicio determine el tipo de distribución de probabilidad, así como los parámetros
+que la describen. Obtener las probabilidades empleado una hoja de cálculo.
+
+** 1. Supongamos que la probabilidad de tener una unidad defectuosa en una línea de ensamblaje es de 0.05. Si el conjunto de unidades terminadas constituye un conjunto de ensayos independientes:
+\begin{equation}
+P(N) = \binom{n}{k} P^N (1 - P)^{n - N}
+\end{equation}
+*** 1. ¿cuál es la probabilidad de que entre diez unidades dos se encuentren defectuosas?
+\begin{verbatim}
+import scipy
+scipy.stats.binom.pmf(2, 10, 0.05)
+\end{verbatim}
+\begin{equation}
+P(2) = \binom{10}{2} P^{2} (1 - 0.05)^{10 - 2} = 0.074634798520019544
+\end{equation}
+
+*** 2. ¿y de que a lo sumo dos se encuentren defectuosas?
+\begin{verbatim}
+import scipy
+scipy.stats.binom.pmf(0, 10, 0.05) + scipy.stats.binom.pmf(1, 10, 0.05) + scipy.stats.binom.pmf(2, 10, 0.05)
+\end{verbatim}
+
+scipy.stats.binom.pmf(0, 10, 0.05) + scipy.stats.binom.pmf(1, 10, 0.05) + scipy.stats.binom.pmf(2, 10, 0.05)
+\begin{equation}
+P(N \leq 2) = \binom{10}{i} P^{i} (1 - 0.05)^{10 - i} = 0.98849644262070346
+\end{equation}
+
+*** 3. ¿cual es la probabilidad de que por lo menos una se encuentre defectuosa?
+1 - scipy.stats.binom.pmf(0, 10, 0.05)
+\begin{equation}
+P(N \geq 1) = 1 - \binom{10}{0} P^{0} (0 - 0.05)^{10 - 0} = 0.4012630607616211
+\end{equation}
+
+** 2. Una empresa electrónica observa que el número de componentes que fallan antes de cumplir 100 horas de funcionamiento es una variable aleatoria de Poisson. Si el número promedio de estos fallos es ocho,
+*** 1. ¿cuál es la probabilidad de que falle un componente en 25 horas?
+\begin{verbatim}
+from scipy.stats import poisson
+poisson.pmf(1, 2)
+\end{verbatim}
+
+\begin{equation}
+t = 25*8/100 = 2
+\end{equation}
+
+\begin{equation}
+P(n - 1) = \frac{2^1 e^{-2}}{1!} = 0.2706705664732254
+\end{equation}
+
+
+*** 2. ¿y de que fallen no más de dos componentes en 50 horas?
+\begin{verbatim}
+from scipy.stats import poisson
+poisson.pmf(1, 2)
+\end{verbatim}
+
+\begin{equation}
+50*8/100 = 4
+\end{equation}
+\begin{equation}
+P(n \leq 2) = \sum_{i=0}^{4}\frac{4^i e^{-4}}{i!} = 0.67667641618306351
+\end{equation}
+
+*** 3. ¿cuál es la probabilidad de que fallen por lo menos diez en 125 horas?
+\begin{verbatim}
+from scipy.stats import poisson
+sum = 0
+for x in range(0, 11):
+    sum = sum + poisson.pmf(x, 10)
+print(1 - sum)
+\end{verbatim}
+
+\begin{equation}
+t = 125*8/100 = 10
+\end{equation}
+
+\begin{equation}
+P(n \leq 10) = \sum_{i=0}^{10}\frac{10^i e^{-10}}{i!} = 0.416960249807
+\end{equation}
+
+** 3. Cada muestra de aire tiene 10% de posibilidades de contener una molécula rara particular. Suponga que las muestras son independientes con respecto a la presencia de la molécula rara. Encuentre la probabilidad de que en las siguientes 18 muestras, exactamente 2 contengan la molécula rara.
+\begin{verbatim}
+import scipy
+scipy.stats.binom.pmf(2, 18, 0.1)
+\end{verbatim}
+\begin{verbatim}
+p = 0.1
+n = 18
+x = 2
+\end{verbatim}
+\begin{equation}
+P(2) = \binom{18}{2} P^{2} (1 - 0.1)^{18 - 2} = 0.28351208889433122
+\end{equation}
+
+
+** 4. Un lote contiene 100 piezas de un proveedor de tubería local y 200 unidades de un proveedor de tubería del estado vecino. Si se seleccionan cuatro piezas al azar y sin reemplazo,
+\begin{equation}
+P(4) = \frac{\binom{N - X}{n - x} \binom{X}{x}}{\binom{N}{n}}
+\end{equation}
+
+*** (a) ¿cuál es la probabilidad de que todas sean del proveedor local?
+\begin{verbatim}
+N = 300
+X = 100
+n = 4
+x = 2, 3 o 4
+\end{verbatim}
+\begin{verbatim}
+from scipy.stats import hypergeom
+hypergeom.pmf(4, 300, 100, 4)
+\end{verbatim}
+
+\begin{equation}
+P(4) = \frac{\binom{300 - 100}{4 - i} \binom{100}{i}}{\binom{300}{4}} = 0.011854079843578178
+\end{equation}
+
+
+*** (b) ¿Cuál es la probabilidad de que dos o más piezas de la muestra sean del proveedor local?
+\begin{verbatim}
+N = 300
+X = 100
+n = 4
+x = 0, 1, 2
+\end{verbatim}
+\begin{verbatim}
+from scipy.stats import hypergeom
+sum = 0
+for x in range(0, 2):
+    sum = sum + hypergeom.pmf(x, 300, 100, 4)
+print(1 - sum)
+\end{verbatim}
+\begin{equation}
+P(x \geq 2) = 1 - \sum_{i=0}^{1} \frac{\binom{300 - 100}{4 - i} \binom{100}{i}}{\binom{300}{4}} = 0.407405744727
+\end{equation}
+
+
+*** (c) ¿Cuál es la probabilidad de que al menos una pieza de la muestra sea del proveedor local?
+\begin{verbatim}
+N = 300
+X = 100
+n = 4
+x = 0, 1, 2
+\end{verbatim}
+\begin{verbatim}
+from scipy.stats import hypergeom
+print(1 - hypergeom.pmf(0, 300, 100, 4))
+\end{verbatim}
+\begin{equation}
+P(x \geq 2) = 1 - \frac{\binom{300 - 100}{4 - 0} \binom{100}{0}}{\binom{300}{4}} = 0.804453821962
+\end{equation}
+
+** 5. Supongamos que el número de imperfecciones en un alambre delgado de cobre sigue una distribución Poisson con una media de 2.3 imperfecciones por milímetro.
+
+*** (a) Determine la probabilidad de 2 imperfecciones en un milímetro de alambre.
+*** (b) Determine la probabilidad de 10 imperfecciones en 5 milímetros de alambre.
+\begin{verbatim}
+from scipy.stats import poisson
+poisson.pmf(10, 11.5)
+\end{verbatim}
+\begin{equation}
+P(x = 10) = \frac{11.5^{10} e^{-11.5}}{10!} = 0.11293507088124335
+\end{equation}
+*** (c) Determine la probabilidad de al menos una imperfección en 2mm de alambre
+\begin{verbatim}
+from scipy.stats import poisson
+1 - poisson.pmf(1, 4.6)
+\end{verbatim}
+\begin{equation}
+P(x) = 1 - \frac{4.6^1 e^{-4.6}}{1!} = 0.95376155557468556
+\end{equation}
+** 6. El tiempo de reparación de unas máquinas de escribir tiene una distribución aproximadamente exponencial, con media 22 minutos.
+
+*** 1. Hallar la probabilidad de que el tiempo de reparación sea menor que diez minutos.
+
+*** 2. El costo de reparación es de 2000 pts. por cada media hora o fracción. ¿Cuál es la probabilidad de que una reparación cueste 4000 pts.?
+
+*** 3. Para efectuar una programación, ¿cuánto tiempo se debe asignar a cada reparación para que la probabilidad de que cualquier tiempo de reparación mayor que el tiempo asignado sea solo de 0.1?
+
+** 7. Los pesos de 2 000 soldados presentan una distribución normal de media 65 kg y desviación típica 8 kg. Calcula la probabilidad de que un soldado elegido al azar pese:
+
+*** a) Más de 61 kg.
+
+*** b) Entre 63 y 69 kg.
+
+*** c) Menos de 70 kg.
+
+*** d) Más de 75 kg.
+
+** 8. La duración de un láser semiconductor a potencia constante tiene una distribución normal con media 7.000 horas y desviación típica de 600 horas.
+
+*** a) ¿Cuál es la probabilidad de que el láser falle antes de 5.000 horas?
+
+*** b) ¿Cuál es la duración en horas excedida por el 95 % de los láseres?
+
+*** c) Si se hace uso de tres laseres en un producto y se supone que fallan de manera independiente. ¿Cuál es la probabilidad de que tres sigan funcionando después de 7.000 horas?
+
+** 9. Un banco recibe en promedio 6 cheques falsos al día, suponiendo que el número de cheques falsos sigue una distribución de Poisson, hallar:
+
+*** a) Probabilidad de que se reciban cuatro cheques falsos en un día.
+
+*** b) Probabilidad de que se reciban más de 30 cheques falsos en una semana
+
+** 10. El número de fallos de un instrumento de prueba debidos a las partículas de un producto es una variable de Poisson con media 0,2 fallos por hora.
+
+*** a) ¿Cuál es la probabilidad de que el instrumento no falle en una jornada de 8 horas?
+\begin{verbatim}
+from scipy.stats import poisson
+poisson.pmf(2, 2.3)
+\end{verbatim}
+\begin{equation}
+P(x = 2) = \frac{2.3^2 e^{-2.3}}{2!} = 0.26518464164681588
+\end{equation}
+
+*** b) ¿Cuál es la probabilidad de que haya entre 20 y 40 fallos (ambos incluidos) en un periodo de una semana (funcionando los 7 días, 24 horas diarias)?
+
+** 11. Supóngase que la concentración que cierto contaminante se encuentra distribuida de manera uniforme en el intervalo de 0 a 20 pares de millón. Si se considera tóxica una concentración de 8 o más. ¿Cuál es la probabilidad de que al tomarse una muestra la concentración de esta sea tóxica?. Concentración media y varianza. Probabilidad de que la concentración sea exactamente 10.
+
+** 12. Se ha comprobado que el tiempo de vida de cierto tipo de marcapasos sigue una distribución exponencial con media de 16 años. ¿Cuál es la probabilidad de que a una persona a la que se le ha implantado este marcapasos se le deba reimplantar otro antes de 20 años? Si el marcapasos lleva funcionando correctamente 5 años en un paciente, ¿cuál es la probabilidad de que haya que cambiarlo antes de 25% años?
